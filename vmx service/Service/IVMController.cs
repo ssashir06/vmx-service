@@ -5,7 +5,7 @@ using VMXService;
 
 namespace VMXService.Service
 {
-    public interface IVMController
+    public interface IVMController : IDisposable
     {
         bool IsRunning(string vmx);
         bool StartVMX(string vmx);

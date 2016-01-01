@@ -9,11 +9,16 @@ namespace VMXService.Service
 {
     public partial class Service : ServiceBase
     {
-        protected string _vmx_file = null;
-        protected IVMController _control = null;
+        #region Fields
 
+        protected readonly string _vmx_file = null;
+        protected IVMController _control = null;
         protected bool _invalid_state = false;
         protected Timer _timer = null;
+
+        #endregion
+
+        #region Constructor
 
         public Service()
             : base()
@@ -22,8 +27,8 @@ namespace VMXService.Service
             _invalid_state = true;
 
             WriteLog(
-                "Invalid arguments!\n" +
-                String.Join("\n", Environment.GetCommandLineArgs()), EventLogEntryType.FailureAudit);
+                "Invalid arguments!\n{0}", EventLogEntryType.FailureAudit,
+                String.Join("\n", Environment.GetCommandLineArgs()));
         }
 
         public Service(string vmx_file, VMWareInfo.VMCoreTypes vm_target)
@@ -34,8 +39,14 @@ namespace VMXService.Service
 
             try
             {
-                //_control = new VMControllerByVMRun(vm_target);
-                _control = new VMControllerByAPI(vm_target);
+                if (IsUsingApi)
+                {
+                    _control = new VMControllerByAPI(vm_target);
+                }
+                else
+                {
+                    _control = new VMControllerByVMRun(vm_target);
+                }
             }
             catch (VMXServiceException)
             {
@@ -46,14 +57,26 @@ namespace VMXService.Service
 
             if (!File.Exists(_vmx_file))
             {
-                WriteLog("Specified vmx file '" + _vmx_file + "' does not exists!", EventLogEntryType.FailureAudit);
+                WriteLog("Specified vmx file '{0}' does not exists!", EventLogEntryType.FailureAudit, _vmx_file);
                 _invalid_state = true;
                 return;
             }
 
-            _timer = new Timer(20000);// 20 sec.
+            _timer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
             _timer.Elapsed += new ElapsedEventHandler(OnTimerEvent);
             _timer.Enabled = false;
+        }
+
+        #endregion
+
+        #region Properties
+
+        protected virtual bool IsUsingApi
+        {
+            get
+            {
+                return true;
+            }
         }
 
         protected void SetServiceBehavior()
@@ -63,14 +86,25 @@ namespace VMXService.Service
             ServiceName = "vmx service";
         }
 
+        #endregion
+
+        #region Events
+
         protected void OnTimerEvent(object source, ElapsedEventArgs e)
         {
+            if (_control == null)
+            {
+                WriteLog(
+                    "Cannot control VMX currently.", EventLogEntryType.Error);
+                return;
+            }
+
             if (!_control.IsRunning(_vmx_file))
             {
                 _invalid_state = true;
                 WriteLog(
                     "The VMX should be running, but not.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Warning);
+                    "vmx file is '{0}'.", EventLogEntryType.Warning, _vmx_file);
                 Stop();
             }
         }
@@ -83,24 +117,32 @@ namespace VMXService.Service
                 return;
             }
 
+            if (_control == null)
+            {
+                WriteLog(
+                    "Cannot control VMX currently.", EventLogEntryType.Error);
+                return;
+            }
+
+
             if (_control.IsRunning(_vmx_file))
             {
                 WriteLog(
                     "The VMX file is aleady running.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Information);
+                    "vmx file is '{0}'.", EventLogEntryType.Information, _vmx_file);
             }
             else if (!_control.StartVMX(_vmx_file))
             {
                 WriteLog(
                     "Starting specified vmx was failed.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Error);
+                    "vmx file is '{0}'.", EventLogEntryType.Error, _vmx_file);
                 Stop();
             }
             else
             {
                 WriteLog(
                     "Now starting specified vmx.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Information);
+                    "vmx file is '{0}'.", EventLogEntryType.Information, _vmx_file);
                 _timer.Enabled = true;
             }
         }
@@ -111,11 +153,19 @@ namespace VMXService.Service
 
             if (_invalid_state) return;
 
+            if (_control == null)
+            {
+                WriteLog(
+                    "Cannot control VMX currently.", EventLogEntryType.Error);
+                return;
+            }
+
+
             if (!_control.IsRunning(_vmx_file))
             {
                 WriteLog(
                     "Specified vmx might not be running.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.FailureAudit);
+                    "vmx file is '{0}'.", EventLogEntryType.FailureAudit, _vmx_file);
                 return;
             }
 
@@ -123,14 +173,14 @@ namespace VMXService.Service
             {
                 WriteLog(
                     "Stopping the vmx was failed.\n" + 
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Error);
+                    "vmx file is '{0}'.", EventLogEntryType.Error, _vmx_file);
 
             }
             else 
             {
                 WriteLog(
                     "Stopping specified vmx was finished successfully.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Information);
+                    "vmx file is '{0}'.", EventLogEntryType.Information, _vmx_file);
             }
         }
 
@@ -138,18 +188,26 @@ namespace VMXService.Service
         {
             if (_invalid_state) return;
 
+            if (_control == null)
+            {
+                WriteLog(
+                    "Cannot control VMX currently.", EventLogEntryType.Error);
+                return;
+            }
+
+
             if (!_control.PauseVMX(_vmx_file))
             {
                 WriteLog(
                     "Pausing specified vmx was failed.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Error);
+                    "vmx file is '{0}'.", EventLogEntryType.Error, _vmx_file);
 
             }
             else
             {
                 WriteLog(
                     "Pausing specified vmx was finished successfully.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Information);
+                    "vmx file is '{0}'.", EventLogEntryType.Information, _vmx_file);
             }
         }
 
@@ -157,19 +215,50 @@ namespace VMXService.Service
         {
             if (_invalid_state) return;
 
+            if (_control == null)
+            {
+                WriteLog(
+                    "Cannot control VMX currently.", EventLogEntryType.Error);
+                return;
+            }
+
+
             if (!_control.ContinueVMX(_vmx_file))
             {
                 WriteLog(
                     "Continuing specified vmx was failed.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Error);
+                    "vmx file is '{0}'.", EventLogEntryType.Error, _vmx_file);
 
             }
             else
             {
                 WriteLog(
                     "Continuing specified vmx was finished successfully.\n" +
-                    "vmx file is '" + _vmx_file + "'.", EventLogEntryType.Information);
+                    "vmx file is '{0}'.", EventLogEntryType.Information);
             }
+        }
+
+        #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_control != null)
+            {
+                _control.Dispose();
+                _control = null;
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Logs
+
+        protected void WriteLog(string message, EventLogEntryType type, params object[] messageArgs)
+        {
+            try
+            {
+                EventLog.WriteEntry(string.Format(message, messageArgs), type);
+            }
+            finally { }
         }
 
         protected void WriteLog(string message, EventLogEntryType type)
@@ -178,9 +267,9 @@ namespace VMXService.Service
             {
                 EventLog.WriteEntry(message, type);
             }
-            finally
-            {
-            }
+            finally { }
         }
+
+        #endregion
     }
 }

@@ -24,17 +24,18 @@ namespace VMXService.InstallTool
         {
         }
 
-        protected void ConfigureInstaller(string name)
+        protected void ConfigureInstaller(string vmxname, string accountName)
         {
             _serviceInstaller.ServicesDependedOn = new string[] { "VMAuthdService" };
-            _serviceInstaller.ServiceName = "VMXService(" + name + ")";
-            _serviceInstaller.DisplayName = "VMX Service (" + name + ")";
+            _serviceInstaller.ServiceName = "VMXService(" + vmxname + ")";
+            _serviceInstaller.DisplayName = "VMX Service (" + vmxname + ")";
             _serviceInstaller.DelayedAutoStart = true;
             _serviceInstaller.StartType = ServiceStartMode.Automatic;
             _serviceInstaller.Description = "A service launch specified VMX file as a automatic service.";
 
             _serviceProcessInstaller.Account = ServiceAccount.User;
-            _serviceProcessInstaller.Username = ".\\USERNAME_HERE!";
+            //_serviceProcessInstaller.Username = ".\\USERNAME_HERE!";
+            _serviceProcessInstaller.Username = accountName;
             //_serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
 
             Installers.AddRange(new Installer[] { _serviceProcessInstaller, _serviceInstaller });
@@ -99,20 +100,21 @@ namespace VMXService.InstallTool
             string vmx_file = null, vm_target = null;
             string[] keys_needed = 
             {
-                "Name", 
-                "VMX", 
+                "VMXName", 
+                "VMXFile", 
                 //"Target", 
+                "AccountName",
             };
 
             if (this.Context == null) throw new VMXServiceException("Installation infomation is not given.");
 
-            vmx_file = this.Context.Parameters["VMX"];
+            vmx_file = this.Context.Parameters["VMXFile"];
             vm_target = this.Context.Parameters.ContainsKey("Target")
                 ? this.Context.Parameters["Target"]
                 : new VMTargetNames().GetShortNameByType(new VMWareInfo().VMCore);
 
-            if (!IsValidName(this.Context.Parameters["Name"]))
-                throw new VMXServiceException("Invalid name :'" + this.Context.Parameters["Name"] + "'.");
+            if (!IsValidName(this.Context.Parameters["VMXName"]))
+                throw new VMXServiceException("Invalid name :'" + this.Context.Parameters["VMXName"] + "'.");
             if (new VMTargetNames().GetTypeByShortName(vm_target) == VMWareInfo.VMCoreTypes.UNKNOWN)
                 throw new VMXServiceException("Invalid target name :'" + vm_target + "'.");
 
@@ -134,8 +136,8 @@ namespace VMXService.InstallTool
                     s => "\"" + s + "\""
                 ));
 
-            ConfigureInstaller(this.Context.Parameters["Name"]);
-            stateSaver["Name"] = _serviceInstaller.ServiceName;
+            ConfigureInstaller(this.Context.Parameters["VMXName"], this.Context.Parameters["AccountName"]);
+            stateSaver["VMXName"] = _serviceInstaller.ServiceName;
 
             base.Install(stateSaver);
             AddArguments(parameters);
@@ -143,13 +145,13 @@ namespace VMXService.InstallTool
 
         public override void Rollback(IDictionary savedState)
         {
-            ConfigureInstaller(this.Context.Parameters["Name"]);
+            ConfigureInstaller(this.Context.Parameters["VMXName"], this.Context.Parameters["AccountName"]);
             base.Rollback(savedState);
         }
 
         public override void Uninstall(IDictionary savedState)
         {
-            ConfigureInstaller(this.Context.Parameters["Name"]);
+            ConfigureInstaller(this.Context.Parameters["VMXName"], this.Context.Parameters["AccountName"]);
             base.Uninstall(savedState);
         }
 

@@ -2,6 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using VMXService.Tools;
 
 namespace VMXService.Service
@@ -42,24 +45,28 @@ namespace VMXService.Service
             return Run(arg).IndexOf(vmx) >= 0;
         }
 
-        protected string Run(string[] args)
+        protected string Run(params string[] args)
         {
-            ProcessStartInfo ps_info = new ProcessStartInfo();
-
-            ps_info.FileName = _vmrun_path;
-            ps_info.Arguments = String.Join(" ", args);
-            ps_info.CreateNoWindow = true;
-            ps_info.UseShellExecute = false;
-            ps_info.RedirectStandardOutput = true;
-
-            try
+            using (var proc = new Process())
             {
-                Process proc = Process.Start(ps_info);
-                return proc.StandardOutput.ReadToEnd();
-            }
-            catch
-            {
-                throw;
+                proc.StartInfo.FileName = _vmrun_path;
+                proc.StartInfo.Arguments = String.Join(" ", args);
+                proc.StartInfo.CreateNoWindow = true;
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.RedirectStandardOutput = true;
+                proc.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+
+                try
+                {
+                    proc.Start();
+                    var reading = proc.StandardOutput.ReadToEndAsync();
+                    proc.WaitForExit();
+                    return reading.Result;
+                }
+                catch
+                {
+                    throw;
+                }
             }
         }
 
@@ -127,6 +134,10 @@ namespace VMXService.Service
             Run(arg);
 
             return true;
+        }
+
+        void IDisposable.Dispose()
+        {
         }
 
         #endregion

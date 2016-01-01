@@ -59,6 +59,9 @@ namespace VIX_API_Test
         //
         #endregion
 
+        //string vmx = @"C:\UserData\data\disk-image\Virtual Machines\Ubuntu8.04LTS 64\Ubuntu8.04LTS 64.vmx";
+        string vmx = @"C:\Users\htakeda\Documents\Virtual Machines\Ubuntu 64 ビット\Ubuntu 64 ビット.vmx";
+
         internal virtual IVMController CreateIVMController()
         {
             // TODO: 適切な具象クラスをインスタンス化します。
@@ -75,7 +78,6 @@ namespace VIX_API_Test
             IVMController target = CreateIVMController();
             IVMController vmrun = new VMControllerByVMRun(new VMWareInfo().VMCore);
 
-            string vmx = @"C:\UserData\data\disk-image\Virtual Machines\Ubuntu8.04LTS 64\Ubuntu8.04LTS 64.vmx";
             bool expected = vmrun.IsRunning(vmx);
             bool actual;
             actual = target.IsRunning(vmx);
@@ -90,7 +92,6 @@ namespace VIX_API_Test
         public void StopVMXTest()
         {
             IVMController target = CreateIVMController();
-            string vmx = @"C:\UserData\data\disk-image\Virtual Machines\Ubuntu8.04LTS 64\Ubuntu8.04LTS 64.vmx";
             bool expected = true;
             bool actual;
             actual = target.StopVMX(vmx);
@@ -106,7 +107,6 @@ namespace VIX_API_Test
         public void StartVMXTest()
         {
             IVMController target = CreateIVMController();
-            string vmx = @"C:\UserData\data\disk-image\Virtual Machines\Ubuntu8.04LTS 64\Ubuntu8.04LTS 64.vmx";
             bool expected = true; // TODO: 適切な値に初期化してください
             bool actual;
             actual = target.StartVMX(vmx);
@@ -121,7 +121,6 @@ namespace VIX_API_Test
         public void PauseVMXTest()
         {
             IVMController target = CreateIVMController();
-            string vmx = @"C:\UserData\data\disk-image\Virtual Machines\Ubuntu8.04LTS 64\Ubuntu8.04LTS 64.vmx";
             bool expected = true;
             bool actual;
             actual = target.PauseVMX(vmx);
@@ -136,7 +135,6 @@ namespace VIX_API_Test
         public void ContinueVMXTest()
         {
             IVMController target = CreateIVMController();
-            string vmx = @"C:\UserData\data\disk-image\Virtual Machines\Ubuntu8.04LTS 64\Ubuntu8.04LTS 64.vmx";
             bool expected = true;
             bool actual;
             actual = target.ContinueVMX(vmx);

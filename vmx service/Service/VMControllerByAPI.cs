@@ -117,22 +117,17 @@ namespace VMXService.Service
                     "Unable to find Vix library!\n" + e.ToString());
             }
 
-            int core = 1;// GetVIXServiceProviderByType(type);
+            int core = GetVIXServiceProviderByType(type);
             IJob job = _api.Connect(
                 Constants.VIX_API_VERSION,
                 core,
                 null, 0, null, null, 0, null, null);
 
-            _host = GetResult<VixCOM.IHost>(WaitForResults(job));
+            _host = GetResult<IHost>(WaitForResults(job));
             if (_host == null)
                 throw new VMXServiceException("Connecting to VMWare provider was failed.");
 
             CloseVixObject(job);
-        }
-
-        ~VMControllerByAPI()
-        {
-            CloseVixObject(_api);
         }
 
         protected bool IsRunning(string vmx)
@@ -207,6 +202,15 @@ namespace VMXService.Service
             CloseVixObject(vm);
 
             return success;
+        }
+
+        void IDisposable.Dispose()
+        {
+            if (_api != null)
+            {
+                CloseVixObject(_api);
+                _api = null;
+            }
         }
 
         #endregion

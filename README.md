@@ -30,8 +30,4 @@ Requested system equipment
 	... to run vmx files as a virtual server.
 
 - VMWare VIX
-        ... to build solution file.
-
- Please visit following URL to download these files:
- - https://my.vmware.com/jp/web/vmware/free#desktop_end_user_computing/vmware_player/6_0|PLAYER-607|product_downloads
- - https://my.vmware.com/jp/web/vmware/free#desktop_end_user_computing/vmware_player/6_0|PLAYER-607|drivers_tools
+    ... to build solution file.

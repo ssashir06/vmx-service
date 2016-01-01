@@ -21,7 +21,4 @@ Requested system equipment
  Please install them before setting up this software :
 
 - VMWare Workstation or VMWare Player
-	... to run vmx files as a virtual server.
-
 - VMWare VIX
-    ... to build solution file.

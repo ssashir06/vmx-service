@@ -147,9 +147,14 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>del /Q  "$(ProjectDir)..\vmx service release\*.dll"
+    <PostBuildEvent>if $(ConfigurationName) neq Release (
+  exit /b
+)
+
+del /Q  "$(ProjectDir)..\vmx service release\*.dll"
 del /Q  "$(ProjectDir)..\vmx service release\*.exe"
 del /Q  "$(ProjectDir)..\vmx service release\*.pdb"
+del /Q  "$(ProjectDir)..\vmx service release\*.manifest"
 del /Q  "$(ProjectDir)..\vmx service release\*.config"
 
 copy /Y "$(TargetDir)*" "$(ProjectDir)..\vmx service release"</PostBuildEvent>

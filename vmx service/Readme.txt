@@ -25,49 +25,28 @@ B. Microsoft .Net Framework 2.0 or heigher
 3.1 Windows XP or older
 3.1.1 Setting up
 
-A. Login as a administrator account.
-B. Determine the full-path to the vmx file of your virtual machine (ex. "C:\Path\To\VMX.vmx").
-C. Move the directory "vmx service release" to some place (ex. "C:\vmx service release").
-D. Start "Command Prompt" from your taskbar.
-E. Type:
-	CD %windir%\Microsoft.NET\Framework\v4.0.30319
-F. Type:
-	Installutil /Name="MyServer1" /Vmx="C:\Path\To\VMX.vmx" "C:\vmx service release\vmx service.exe"
-G. Restart your computer.
-H. Done.
-
-Warnings:
-Step F:
-	The name "MyServer1" is just an example. It is can be like /^[a-zA-Z_-]+$/.
-Step F:
-	Double quotations are required.
-Step F:
-	The message "The Commit phase completed successfully." means succeess.
-	The message "The Rollback phase completed successfully." means failure.
+A. Edit "install.bat"
+   Change VMXNAME and VMXFILE.
+   VMXNAME is a name of the service, like /^[a-zA-Z0-9_-]+$/.
+   VMXFILE is a fullpath of the vmx file to run, like "C:\Path\To\VMX.vmx".
+B. Run "install.bat" as a administrator.
+   The message "The Commit phase completed successfully." means succeess.
+   The message "The Rollback phase completed successfully." means failure.
+C. Restart your computer.
+D. Done.
 
 3.1.2 Remove
 
-A. Login as a administrator account.
-B. Determine the full-path to the directory this software is installed (ex. "C:\vmx service release\vmx service.exe").
-C. Start "Command Prompt" from your taskbar.
-D. Type:
-	CD %windir%\Microsoft.NET\Framework\v4.0.30319
-E. Type:
-	Installutil /u /Name="MyServer1" "C:\vmx service release\vmx service.exe"
-F. Restart your computer.
-G. Done.
-
-3.2. Windows Vista or Windows 7 or later
-3.2.1 Setting up
-
-See 3.1.1 and you have to start "Command Prompt" as a Administrator in the Step D.
-To do this, Right click "Command Prompt" and click "Run as administrator".
-
-3.2.2 Remove
-
-See 3.1.2 and also you have to start "Command Prompt" as a Administrator in the Step C.
+A. Edit "uninstall.bat"
+   Change VMXNAME.
+   VMXNAME is a name of the service, you specified on the "install.bat".
+B. Run "uninstall.bat" as a administrator.
+   The message "The Commit phase completed successfully." means succeess.
+   The message "The Rollback phase completed successfully." means failure.
+C. Restart your computer.
+D. Done.
 
 
 4. Others
 
-Go to website http://hujiko.net/ .
+ Have a nice day.

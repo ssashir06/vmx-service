@@ -17,12 +17,8 @@ About this software
 Why is this software needed?
 ---
 
- This software is needed to run some virtual machines with VMWare Workstation or VMWare Player like being under VMWare Server.
+ This software is needed to run some virtual machines with VMWare Workstation or VMWare Player without start/end controlling.
 
-Why don't use VMWare Server?
----
-
- Because its GUI's response is too slow.
 
 Requested system equipment
 ---
@@ -30,11 +26,11 @@ Requested system equipment
  There are some requestments to use this software.
  Please install them before setting up this software :
 
-VMWare Workstation or VMWare Player
+- VMWare Workstation or VMWare Player
 	... to run vmx files as a virtual server.
 
-VMWare VIX
-    ... to build solution file.
+- VMWare VIX
+        ... to build solution file.
 
  Please visit following URL to download these files:
  - https://my.vmware.com/jp/web/vmware/free#desktop_end_user_computing/vmware_player/6_0|PLAYER-607|product_downloads

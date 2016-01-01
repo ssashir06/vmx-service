@@ -3,3 +3,5 @@
 /vmx service.exe
 /vmx service.exe.config
 /vmx service.pdb
+/vmx service.Install*
+/*.InstallLog

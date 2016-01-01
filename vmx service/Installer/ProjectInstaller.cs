@@ -91,7 +91,7 @@ namespace VMXService.InstallTool
 
         protected bool IsValidName(string name)
         {
-            return new Regex("^[a-zA-Z_-]+$").IsMatch(name);
+            return new Regex("^[a-zA-Z0-9_-]+$").IsMatch(name);
         }
 
         public override void Install(IDictionary stateSaver)
